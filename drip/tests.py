@@ -49,7 +49,10 @@ class DripsTestCase(TestCase):
         num_string = ['first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth']
 
         for i, name in enumerate(num_string):
-            user = self.User.objects.create(username='%s_25_credits_a_day' % name, email='%s@test.com' % name)
+            user = self.User.objects.create(
+                username=f'{name}_25_credits_a_day', email=f'{name}@test.com'
+            )
+
             self.User.objects.filter(id=user.id).update(date_joined=start - timedelta(days=i))
 
             profile = Profile.objects.get(user=user)
@@ -57,7 +60,10 @@ class DripsTestCase(TestCase):
             profile.save()
 
         for i, name in enumerate(num_string):
-            user = self.User.objects.create(username='%s_no_credits' % name, email='%s@test.com' % name)
+            user = self.User.objects.create(
+                username=f'{name}_no_credits', email=f'{name}@test.com'
+            )
+
             self.User.objects.filter(id=user.id).update(date_joined=start - timedelta(days=i))
 
     def test_users_exists(self):

@@ -36,13 +36,14 @@ class Drip(models.Model):
     def drip(self):
         from drip.drips import DripBase
 
-        drip = DripBase(drip_model=self,
-                        name=self.name,
-                        from_email=self.from_email if self.from_email else None,
-                        from_email_name=self.from_email_name if self.from_email_name else None,
-                        subject_template=self.subject_template if self.subject_template else None,
-                        body_template=self.body_html_template if self.body_html_template else None)
-        return drip
+        return DripBase(
+            drip_model=self,
+            name=self.name,
+            from_email=self.from_email or None,
+            from_email_name=self.from_email_name or None,
+            subject_template=self.subject_template or None,
+            body_template=self.body_html_template or None,
+        )
 
     def __unicode__(self):
         return self.name
@@ -109,15 +110,14 @@ class QuerySetRule(models.Model):
         try:
             self.apply(User.objects.all())
         except Exception as e:
-            raise ValidationError(
-                '%s raised trying to apply rule: %s' % (type(e).__name__, e))
+            raise ValidationError(f'{type(e).__name__} raised trying to apply rule: {e}')
 
     @property
     def annotated_field_name(self):
         field_name = self.field_name
         if field_name.endswith('__count'):
             agg, _, _ = field_name.rpartition('__')
-            field_name = 'num_%s' % agg.replace('__', '_')
+            field_name = f"num_{agg.replace('__', '_')}"
 
         return field_name
 
@@ -159,9 +159,7 @@ class QuerySetRule(models.Model):
         if self.field_value == 'False':
             field_value = False
 
-        kwargs = {field_name: field_value}
-
-        return kwargs
+        return {field_name: field_value}
 
     def apply(self, qs, now=datetime.now):
 

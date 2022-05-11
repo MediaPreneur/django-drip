@@ -13,10 +13,15 @@ class QuerySetRuleInline(admin.TabularInline):
     model = QuerySetRule
 
 
+
+
 class DripForm(forms.ModelForm):
     message_class = forms.ChoiceField(
-        choices=((k, '%s (%s)' % (k, v)) for k, v in configured_message_classes().items())
+        choices=(
+            (k, f'{k} ({v})') for k, v in configured_message_classes().items()
+        )
     )
+
     class Meta:
         model = Drip
         exclude = []

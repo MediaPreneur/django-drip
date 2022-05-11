@@ -32,8 +32,7 @@ def message_class_for(name):
     path = configured_message_classes()[name]
     mod_name, klass_name = path.rsplit('.', 1)
     mod = import_module(mod_name)
-    klass = getattr(mod, klass_name)
-    return klass
+    return getattr(mod, klass_name)
 
 
 class DripMessage(object):
@@ -83,7 +82,7 @@ class DripMessage(object):
     def message(self):
         if not self._message:
             if self.drip_base.from_email_name:
-                from_ = "%s <%s>" % (self.drip_base.from_email_name, self.drip_base.from_email)
+                from_ = f"{self.drip_base.from_email_name} <{self.drip_base.from_email}>"
             else:
                 from_ = self.drip_base.from_email
 
@@ -199,9 +198,7 @@ class DripBase(object):
             return None
 
         self.prune()
-        count = self.send()
-
-        return count
+        return self.send()
 
     def prune(self):
         """
@@ -231,8 +228,7 @@ class DripBase(object):
         for user in self.get_queryset():
             message_instance = MessageClass(self, user)
             try:
-                result = message_instance.message.send()
-                if result:
+                if result := message_instance.message.send():
                     SentDrip.objects.create(
                         drip=self.drip_model,
                         user=user,
@@ -243,7 +239,7 @@ class DripBase(object):
                     )
                     count += 1
             except Exception as e:
-                logging.error("Failed to send drip %s to user %s: %s" % (self.drip_model.id, user, e))
+                logging.error(f"Failed to send drip {self.drip_model.id} to user {user}: {e}")
 
         return count
 
